@@ -1,6 +1,6 @@
-# 🛍️ Advanced E-Commerce Platform
+# 🛍️ Hospital Management System
 
-An **Advanced E-Commerce Web Application** built using the **Django Framework**, designed to deliver a complete and seamless online shopping experience for users and efficient management tools for administrators.
+The **Hospital Management System** built using the **Django Framework**, designed to deliver a complete and seamless online hospital experience for patients and efficient management tools for administration.
 
 ---
 
@@ -12,7 +12,7 @@ An **Advanced E-Commerce Web Application** built using the **Django Framework**,
 ---
 
 ## 🎯 Project Overview
-The **Advanced E-Commerce Platform** is a full-featured web application developed as part of our **college project**.  
+The **Hospital Management System** is a full-featured web application developed as part of our **college project**.  
 It aims to simulate a real-world online shopping system where users can browse, search, and purchase products, while administrators can manage inventory, users, and orders from a secure backend panel.
 
 This project demonstrates a strong understanding of **web development using Django**, **database integration**, **user authentication**, and **dynamic front-end rendering**.

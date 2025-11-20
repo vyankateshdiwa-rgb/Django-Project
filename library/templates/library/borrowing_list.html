@@ -1,0 +1,82 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Borrowings - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{% if user.is_staff %}All Borrowings{% else %}My Borrowings{% endif %}</h1>
+    <a href="{% url 'borrowing_create' %}" class="btn btn-primary">➕ New Borrowing</a>
+</div>
+
+<div class="filter-section">
+    <a href="{% url 'borrowing_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %}">All</a>
+    <a href="{% url 'borrowing_list' %}?status=active" class="btn btn-sm {% if status_filter == 'active' %}btn-primary{% else %}btn-outline{% endif %}">Active</a>
+    <a href="{% url 'borrowing_list' %}?status=returned" class="btn btn-sm {% if status_filter == 'returned' %}btn-primary{% else %}btn-outline{% endif %}">Returned</a>
+</div>
+
+{% if page_obj %}
+<div class="table-responsive">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Borrower</th>
+                <th>Email</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for borrowing in page_obj %}
+            <tr>
+                <td><a href="{% url 'book_detail' borrowing.book.pk %}">{{ borrowing.book.title }}</a></td>
+                <td>{{ borrowing.borrower_name }}</td>
+                <td>{{ borrowing.borrower_email }}</td>
+                <td>{{ borrowing.borrow_date|date:"M d, Y" }}</td>
+                <td>{{ borrowing.due_date|date:"M d, Y" }}</td>
+                <td>
+                    {% if borrowing.is_returned %}
+                    <span class="badge badge-success">Returned</span>
+                    {% if borrowing.return_date %}
+                    <small>({{ borrowing.return_date|date:"M d, Y" }})</small>
+                    {% endif %}
+                    {% else %}
+                    <span class="badge badge-warning">Active</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not borrowing.is_returned %}
+                    <a href="{% url 'borrowing_return' borrowing.pk %}" class="btn btn-sm btn-success">Return</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn btn-outline">« First</a>
+    <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn btn-outline">‹ Prev</a>
+    {% endif %}
+    
+    <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn btn-outline">Next ›</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn btn-outline">Last »</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <p>No borrowings found. <a href="{% url 'borrowing_create' %}">Create a new borrowing</a></p>
+</div>
+{% endif %}
+{% endblock %}
+

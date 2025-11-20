@@ -1,0 +1,31 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Return Book - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Return Book</h1>
+    <a href="{% url 'borrowing_list' %}" class="btn btn-outline">← Back</a>
+</div>
+
+<div class="return-confirm">
+    <div class="info-box">
+        <h2>Confirm Return</h2>
+        <div class="return-details">
+            <p><strong>Book:</strong> {{ borrowing.book.title }}</p>
+            <p><strong>Borrower:</strong> {{ borrowing.borrower_name }}</p>
+            <p><strong>Borrow Date:</strong> {{ borrowing.borrow_date|date:"F d, Y" }}</p>
+            <p><strong>Due Date:</strong> {{ borrowing.due_date|date:"F d, Y" }}</p>
+        </div>
+    </div>
+
+    <form method="post" class="return-form">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Confirm Return</button>
+            <a href="{% url 'borrowing_list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

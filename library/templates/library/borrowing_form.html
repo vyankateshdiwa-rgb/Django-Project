@@ -1,0 +1,85 @@
+{% extends 'library/base.html' %}
+
+{% block title %}{{ title }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'borrowing_list' %}" class="btn btn-outline">← Back to Borrowings</a>
+</div>
+
+{% if book %}
+<div class="book-info-box">
+    <h3>Borrowing: {{ book.title }}</h3>
+    <p>by {{ book.author.name }}</p>
+    <p>Available copies: {{ book.available_copies }} / {{ book.total_copies }}</p>
+</div>
+{% endif %}
+
+<div class="form-container">
+    <form method="post" class="form">
+        {% csrf_token %}
+        
+        {% if not book %}
+        <div class="form-group">
+            <label for="{{ form.book.id_for_label }}">Book *</label>
+            {{ form.book }}
+            {% if form.book.errors %}
+            <div class="error-message">{{ form.book.errors }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if user.is_staff %}
+        <div class="form-group">
+            <label for="{{ form.borrower_name.id_for_label }}">Borrower Name *</label>
+            {{ form.borrower_name }}
+            {% if form.borrower_name.errors %}
+            <div class="error-message">{{ form.borrower_name.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.borrower_email.id_for_label }}">Email *</label>
+                {{ form.borrower_email }}
+                {% if form.borrower_email.errors %}
+                <div class="error-message">{{ form.borrower_email.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.borrower_phone.id_for_label }}">Phone</label>
+                {{ form.borrower_phone }}
+                {% if form.borrower_phone.errors %}
+                <div class="error-message">{{ form.borrower_phone.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="info-box">
+            <p><strong>Borrowing as:</strong> {{ user.get_full_name|default:user.username }} ({{ user.email }})</p>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.due_date.id_for_label }}">Due Date *</label>
+            {{ form.due_date }}
+            {% if form.due_date.errors %}
+            <div class="error-message">{{ form.due_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="error-message">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Borrow Book</button>
+            <a href="{% url 'borrowing_list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

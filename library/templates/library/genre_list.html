@@ -1,0 +1,31 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Genres - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Genres</h1>
+    {% if user.is_staff %}
+    <a href="{% url 'genre_create' %}" class="btn btn-primary">➕ Add New Genre</a>
+    {% endif %}
+</div>
+
+{% if genres %}
+<div class="genres-grid">
+    {% for genre in genres %}
+    <div class="genre-card">
+        <h3><a href="{% url 'book_list' %}?genre={{ genre.pk }}">{{ genre.name }}</a></h3>
+        {% if genre.description %}
+        <p>{{ genre.description }}</p>
+        {% endif %}
+        <p class="genre-count">{{ genre.books.count }} book{{ genre.books.count|pluralize }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No genres found.{% if user.is_staff %} <a href="{% url 'genre_create' %}">Add your first genre</a>{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

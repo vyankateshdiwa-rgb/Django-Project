@@ -1,0 +1,51 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Authors - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Authors</h1>
+    {% if user.is_staff %}
+    <a href="{% url 'author_create' %}" class="btn btn-primary">➕ Add New Author</a>
+    {% endif %}
+</div>
+
+{% if page_obj %}
+<div class="authors-grid">
+    {% for author in page_obj %}
+    <div class="author-card">
+        <div class="author-avatar">{{ author.name|first|upper }}</div>
+        <div class="author-info">
+            <h3><a href="{% url 'author_detail' author.pk %}">{{ author.name }}</a></h3>
+            {% if author.birth_date %}
+            <p class="author-meta">Born: {{ author.birth_date|date:"Y" }}</p>
+            {% endif %}
+            <p class="author-books">{{ author.books.count }} book{{ author.books.count|pluralize }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page=1" class="btn btn-outline">« First</a>
+    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline">‹ Prev</a>
+    {% endif %}
+    
+    <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline">Next ›</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline">Last »</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <p>No authors found.{% if user.is_staff %} <a href="{% url 'author_create' %}">Add your first author</a>{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,57 @@
+{% extends 'library/base.html' %}
+
+{% block title %}{{ author.name }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ author.name }}</h1>
+    <a href="{% url 'author_list' %}" class="btn btn-outline">← Back to Authors</a>
+</div>
+
+<div class="author-detail">
+    <div class="author-bio">
+        {% if author.birth_date %}
+        <p><strong>Born:</strong> {{ author.birth_date|date:"F d, Y" }}</p>
+        {% endif %}
+        {% if author.bio %}
+        <div class="bio-text">
+            <h3>Biography</h3>
+            <p>{{ author.bio|linebreaks }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if books %}
+    <div class="author-books">
+        <h2>Books by {{ author.name }} ({{ books.count }})</h2>
+        <div class="books-grid">
+            {% for book in books %}
+            <div class="book-card">
+                {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="book-cover">
+                {% else %}
+                <div class="book-cover-placeholder">📖</div>
+                {% endif %}
+                <div class="book-info">
+                    <h3><a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a></h3>
+                    <div class="book-meta">
+                        {% if book.available_copies > 0 %}
+                            <span class="badge badge-available">Available: {{ book.available_copies }} {{ book.available_copies|pluralize:"copy,copies" }}</span>
+                        {% else %}
+                            <span class="badge badge-{{ book.status }}">{{ book.get_status_display }}</span>
+                        {% endif %}
+                        <span class="book-copies">{{ book.available_copies }}/{{ book.total_copies }} copies</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No books by this author yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,133 @@
+{% extends 'library/base.html' %}
+
+{% block title %}{{ book.title }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <a href="{% url 'book_list' %}" class="btn btn-outline">← Back to Books</a>
+    {% if user.is_staff %}
+    <div class="header-actions">
+        <a href="{% url 'book_update' book.pk %}" class="btn btn-secondary">✏️ Edit</a>
+        <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️ Delete</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="detail-container">
+    <div class="detail-main">
+        <div class="book-detail-cover">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+            {% else %}
+            <div class="book-cover-placeholder large">📖</div>
+            {% endif %}
+        </div>
+        <div class="book-detail-info">
+            <h1>{{ book.title }}</h1>
+            <p class="detail-author">by <a href="{% url 'author_detail' book.author.pk %}">{{ book.author.name }}</a></p>
+            
+            <div class="detail-meta">
+                <div class="meta-item">
+                    <strong>Status:</strong>
+                    {% if book.available_copies > 0 %}
+                        <span class="badge badge-available">Available: {{ book.available_copies }} {{ book.available_copies|pluralize:"copy,copies" }}</span>
+                    {% else %}
+                        <span class="badge badge-{{ book.status }}">{{ book.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                <div class="meta-item">
+                    <strong>Available Copies:</strong>
+                    <span>{{ book.available_copies }} / {{ book.total_copies }}</span>
+                </div>
+                {% if book.isbn %}
+                <div class="meta-item">
+                    <strong>ISBN:</strong>
+                    <span>{{ book.isbn }}</span>
+                </div>
+                {% endif %}
+                {% if book.genre %}
+                <div class="meta-item">
+                    <strong>Genre:</strong>
+                    <a href="{% url 'book_list' %}?genre={{ book.genre.pk }}">{{ book.genre.name }}</a>
+                </div>
+                {% endif %}
+                {% if book.published_date %}
+                <div class="meta-item">
+                    <strong>Published:</strong>
+                    <span>{{ book.published_date|date:"Y" }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if book.description %}
+            <div class="detail-description">
+                <h3>Description</h3>
+                <p>{{ book.description|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <div class="detail-actions">
+                {% if book.content_file %}
+                <div class="content-actions" style="margin-bottom: 1rem;">
+                    {% if user.is_authenticated %}
+                        {% if user_has_borrowed or user.is_staff %}
+                        <a href="{% url 'book_content_view' book.pk %}" target="_blank" class="btn btn-primary btn-lg">📄 View Content</a>
+                        <a href="{% url 'book_content_download' book.pk %}" class="btn btn-secondary btn-lg">⬇️ Download</a>
+                        {% else %}
+                        <div class="info-box" style="margin-bottom: 1rem;">
+                            <p><strong>⚠️ Borrow Required:</strong> You must borrow this book first to view or download its content.</p>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <a href="{% url 'login' %}?next={% url 'book_detail' book.pk %}" class="btn btn-primary btn-lg">🔐 Login to View Content</a>
+                    <a href="{% url 'login' %}?next={% url 'book_detail' book.pk %}" class="btn btn-secondary btn-lg">🔐 Login to Download</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    {% if book.available_copies > 0 %}
+                    <a href="{% url 'borrowing_create_book' book.pk %}" class="btn btn-success btn-lg">📖 Borrow This Book</a>
+                    {% else %}
+                    <button class="btn btn-success btn-lg" disabled>Not Available</button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'book_detail' book.pk %}" class="btn btn-success btn-lg">🔐 Login to Borrow</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if borrowings and user.is_staff %}
+    <div class="borrowing-section">
+        <h2>Current Borrowings</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Borrower</th>
+                        <th>Email</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for borrowing in borrowings %}
+                    <tr>
+                        <td>{{ borrowing.borrower_name }}</td>
+                        <td>{{ borrowing.borrower_email }}</td>
+                        <td>{{ borrowing.borrow_date|date:"M d, Y" }}</td>
+                        <td>{{ borrowing.due_date|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'borrowing_return' borrowing.pk %}" class="btn btn-sm btn-success">Return</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

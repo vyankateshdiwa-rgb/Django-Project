@@ -1,0 +1,131 @@
+{% extends 'library/base.html' %}
+
+{% block title %}{{ title }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'book_list' %}" class="btn btn-outline">← Back to Books</a>
+</div>
+
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Title *</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <div class="error-message">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.author.id_for_label }}">Author *</label>
+                {{ form.author }}
+                {% if form.author.errors %}
+                <div class="error-message">{{ form.author.errors }}</div>
+                {% endif %}
+                {% if user.is_staff %}
+                <small><a href="{% url 'author_create' %}" target="_blank">Add new author</a></small>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.genre.id_for_label }}">Genre</label>
+                {{ form.genre }}
+                {% if form.genre.errors %}
+                <div class="error-message">{{ form.genre.errors }}</div>
+                {% endif %}
+                {% if user.is_staff %}
+                <small><a href="{% url 'genre_create' %}" target="_blank">Add new genre</a></small>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.isbn.id_for_label }}">ISBN</label>
+            {{ form.isbn }}
+            {% if form.isbn.errors %}
+            <div class="error-message">{{ form.isbn.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="error-message">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.published_date.id_for_label }}">Published Date</label>
+                {{ form.published_date }}
+                {% if form.published_date.errors %}
+                <div class="error-message">{{ form.published_date.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.total_copies.id_for_label }}">Total Copies *</label>
+                {{ form.total_copies }}
+                {% if form.total_copies.errors %}
+                <div class="error-message">{{ form.total_copies.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.available_copies.id_for_label }}">Available Copies *</label>
+                {{ form.available_copies }}
+                {% if form.available_copies.errors %}
+                <div class="error-message">{{ form.available_copies.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.cover_image.id_for_label }}">Cover Image</label>
+            {{ form.cover_image }}
+            {% if form.cover_image.errors %}
+            <div class="error-message">{{ form.cover_image.errors }}</div>
+            {% endif %}
+            {% if book and book.cover_image %}
+            <div class="current-image">
+                <p>Current image:</p>
+                <img src="{{ book.cover_image.url }}" alt="Current cover" class="preview-image">
+            </div>
+            {% endif %}
+            <div id="image-preview" class="image-preview" style="display: none; margin-top: 10px;">
+                <p>Preview:</p>
+                <img id="preview-img" src="" alt="Preview" class="preview-image">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.content_file.id_for_label }}">Book Content (PDF/Document)</label>
+            {{ form.content_file }}
+            {% if form.content_file.errors %}
+            <div class="error-message">{{ form.content_file.errors }}</div>
+            {% endif %}
+            <small>Upload PDF, DOC, DOCX, TXT, or EPUB file. Users can view or download this content.</small>
+            {% if book and book.content_file %}
+            <div class="current-file" style="margin-top: 1rem;">
+                <p><strong>Current file:</strong> <a href="{{ book.content_file.url }}" target="_blank">{{ book.content_file.name|slice:"15:" }}</a></p>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="error-message">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Book</button>
+            <a href="{% if book %}{% url 'book_detail' book.pk %}{% else %}{% url 'book_list' %}{% endif %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

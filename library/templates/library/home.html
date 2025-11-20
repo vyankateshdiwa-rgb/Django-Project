@@ -1,0 +1,98 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Home - Library Management System{% endblock %}
+
+{% block content %}
+<div class="home-hero">
+    <h1 class="hero-title">Welcome to Library Management System</h1>
+    <p class="hero-subtitle">Manage your library efficiently with our comprehensive system</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📖</div>
+        <div class="stat-info">
+            <h3>{{ total_books }}</h3>
+            <p>Total Books</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✍️</div>
+        <div class="stat-info">
+            <h3>{{ total_authors }}</h3>
+            <p>Authors</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🏷️</div>
+        <div class="stat-info">
+            <h3>{{ total_genres }}</h3>
+            <p>Genres</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-info">
+            <h3>{{ available_books }}</h3>
+            <p>Available Books</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+            <h3>{{ borrowed_books }}</h3>
+            <p>Borrowed Books</p>
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="action-buttons">
+        {% if user.is_staff %}
+        <a href="{% url 'book_create' %}" class="btn btn-primary">➕ Add New Book</a>
+        <a href="{% url 'author_create' %}" class="btn btn-secondary">➕ Add New Author</a>
+        {% endif %}
+        {% if user.is_authenticated %}
+        <a href="{% url 'borrowing_create' %}" class="btn btn-success">📖 Borrow Book</a>
+        <a href="{% url 'borrowing_list' %}" class="btn btn-secondary">📋 My Borrowings</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-success">🔐 Login to Borrow</a>
+        {% endif %}
+        <a href="{% url 'book_list' %}" class="btn btn-outline">🔍 Browse Books</a>
+    </div>
+</div>
+
+{% if recent_books %}
+<div class="recent-section">
+    <h2>Recent Books</h2>
+    <div class="books-grid">
+        {% for book in recent_books %}
+        <div class="book-card">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="book-cover">
+            {% else %}
+            <div class="book-cover-placeholder">📖</div>
+            {% endif %}
+            <div class="book-info">
+                <h3><a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a></h3>
+                <p class="book-author">{{ book.author.name }}</p>
+                <div class="book-meta">
+                    {% if book.available_copies > 0 %}
+                        <span class="badge badge-available">Available: {{ book.available_copies }} {{ book.available_copies|pluralize:"copy,copies" }}</span>
+                    {% else %}
+                        <span class="badge badge-{{ book.status }}">{{ book.get_status_display }}</span>
+                    {% endif %}
+                    <span class="book-copies">{{ book.available_copies }}/{{ book.total_copies }} copies</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center">
+        <a href="{% url 'book_list' %}" class="btn btn-outline">View All Books →</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
